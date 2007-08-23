@@ -88,11 +88,17 @@ install -m755 %{SOURCE0} %{buildroot}/%{_bindir}
 
 
 #Menu
-mkdir -p $RPM_BUILD_ROOT%{_menudir}
-cat << EOF > $RPM_BUILD_ROOT%{_menudir}/%{name}
-?package(cursor_themes):command="choose_cursor" icon="%{name}.png" \
-needs="x11" section="Configuration/Other" title="Cursor Themes" \
-longtitle="Choose a Cursor Theme"
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications/
+cat << EOF > %buildroot%{_datadir}/applications/mandriva-%{name}.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=Cursor Themes
+Comment=Choose a Cursor Theme
+Exec=choose_cursor
+Icon=%{name}
+Terminal=false
+Type=Application
+Categories=System;X-MandrivaLinux-System-Configuration-Other;Settings;
 EOF
 
 mkdir -p %{buildroot}/{%{_iconsdir},%{_miconsdir},%{_liconsdir}}
@@ -165,7 +171,7 @@ fi
 
 %files -f %name.files
 %defattr(-,root,root)
-%{_menudir}/%{name}
+%{_datadir}/applications/mandriva-%{name}.desktop
 %{_iconsdir}/%{name}.png
 %{_miconsdir}/%{name}.png
 %{_liconsdir}/%{name}.png
