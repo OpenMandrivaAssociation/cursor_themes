@@ -91,7 +91,6 @@ install -m755 %{SOURCE0} %{buildroot}/%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications/
 cat << EOF > %buildroot%{_datadir}/applications/mandriva-%{name}.desktop
 [Desktop Entry]
-Encoding=UTF-8
 Name=Cursor Themes
 Comment=Choose a Cursor Theme
 Exec=choose_cursor
