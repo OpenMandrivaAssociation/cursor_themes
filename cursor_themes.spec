@@ -1,7 +1,7 @@
 %define name    cursor_themes
 
 %define version 0.0.5
-%define release %mkrel 3
+%define release %mkrel 4
 
 Summary:	A Collection of cursor themes for XFree86 4.3 or later
 Name:		%{name}
@@ -97,7 +97,7 @@ Exec=choose_cursor
 Icon=%{name}
 Terminal=false
 Type=Application
-Categories=System;X-MandrivaLinux-System-Configuration-Other;Settings;
+Categories=Settings;DesktopSettings;
 EOF
 
 mkdir -p %{buildroot}/{%{_iconsdir},%{_miconsdir},%{_liconsdir}}
@@ -175,4 +175,3 @@ fi
 %{_miconsdir}/%{name}.png
 %{_liconsdir}/%{name}.png
 %{_bindir}/*
-
