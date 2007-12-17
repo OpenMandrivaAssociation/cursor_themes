@@ -47,7 +47,6 @@ Source32:	10163-justblue-0.21.tar.bz2
 Source33:	10211-daliesque.tar.bz2
 Source34:	11313-pearlgrey-1.0.tar.bz2
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}
 Requires:	gtkdialogs
 Requires:	XFree86 >= 4.3
 BuildRequires:	ImageMagick XFree86 >= 4.3
