@@ -162,11 +162,15 @@ if [ "$1" = "2" -a -d %{_datadir}/icons/reddot ]; then
  rm -rf %{_datadir}/icons/reddot
 fi
 
+%if %mdkversion < 200900
 %post
 %{update_menus}
+%endif
 
+%if %mdkversion < 200900
 %postun
 %{clean_menus}
+%endif
 
 %files -f %name.files
 %defattr(-,root,root)
