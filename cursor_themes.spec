@@ -1,7 +1,7 @@
 %define name    cursor_themes
 
 %define version 0.0.5
-%define release %mkrel 4
+%define release %mkrel 6
 
 Summary:	A Collection of cursor themes for XFree86 4.3 or later
 Name:		%{name}
