@@ -50,7 +50,7 @@ Source34:	11313-pearlgrey-1.0.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 Requires:	gtkdialogs
 Requires:	XFree86 >= 4.3
-BuildRequires:	ImageMagick XFree86 >= 4.3
+BuildRequires:	imagemagick XFree86 >= 4.3
 Prefix:		%{_prefix}
 
 %description
