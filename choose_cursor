@@ -1,0 +1,193 @@
+#!/bin/bash
+#
+# choose_cursor
+# (c) Buchan Milne <bgmilne@linux-mandrake.com> 2003 
+# License: GPLv2
+# 
+# choose_cursor is a simple script to allow users to choose from the mouse
+# cursor themes installed on their system (/usr/share/icons/*/cursors) or in
+# their home directory ($HOME/.icons/*/cursor).
+# At present it does not deal with icons in /usr/share/icons/default or
+# $HOME/.icons/default/
+#
+# Changelog
+# v0.0.5 - 20040419
+#  - Fix support for zenity's gdialog (really better fix for chatty kdialog)
+#  - Prevent themes ever getting version numbers
+#  - Ensure we really get user icons
+# v0.0.4 - 20030826
+#  - Fixes for chatty kdialog (don't redirect stderr to stdout), but don't
+#    break cdialog support (outputs choice to stderr)
+#  - Tell the user if we don't have a usable dialog program
+#  - Don't use gdialog in console (zenity gdialog doesn't work in console)
+#  - Adjust dialog sizes to fit for cdialog
+#
+# v0.0.3 - 20030716
+#  - Cleanups
+#  - Fix not selecting cursor theme every 2nd time if index.theme didn't exist
+#    when we started
+#
+# v0.0.2 - 20030406
+#  - Use gdialog/kdialog if avialable
+#  - Allow user to "preview" (if the dialog shows the new cursor) before
+#    "applying"
+#  - Offer to restart WM to apply themes to the WM
+#    Contributions from many cookers
+#    KDE, Windowmaker should work since one can find if they are running easily
+#    For GNOME, we currently assume metacity is running :-(
+#  - Use mktemp for index backup file
+#  - Suggest preview with other app when not using kdialog
+#  - Quote and queit which again (Duncan)
+# v0.0.1 - 20030329
+#  - First version used gmessage (gchooser isn't consistent :-()
+#  - We now use Xdialog, because we have too many themes to fit a gmessage
+#    on a reasonable size screen
+
+ICONS=/usr/share/icons
+USERICONS=~/.icons
+INDEXFILE=default/index.theme
+
+TMPFILE=""
+
+c=("" core `find $ICONS $USERICONS -type d -name 'cursors' |sed 's,.*/\(.*\)/cursors,\1,g' |grep -v default|sort 2>/dev/null`)
+
+MENU=`for ((i=1;i<=$[${#c[*]}-2];i=$i+1));do echo -n "$i ${c[i]} ";done``echo -n "$[${#c[*]}-1] ${c[$[${#c[*]}-1]]}"`
+MESSAGE="Please choose a cursor theme:"
+
+# Find a dialog program we can use, either kdialog or gdialog
+# if we are running in console, gdialog or dialog
+if [ -n "$DISPLAY" ]
+then
+	# Use desktop dialog programs if available
+	[ -x "`which kdialog 2>&-`" -a "$DESKTOP" == "kde" ] && DIALOG="kdialog"
+	[ -x "`which gdialog 2>&-`" -a -n "$GNOME_DESKTOP_SESSION_ID" ] && DIALOG="gdialog"
+	# Fall back to gdialog, kdialog or Xdialog if they exist
+	[ -z "$DIALOG" -a -x "`which gdialog 2>&-`" ] && DIALOG="gdialog"
+	[ -z "$DIALOG" -a -x "`which kdialog 2>&-`" ] && DIALOG="kdialog"
+	[ -z "$DIALOG" -a -x "`which Xdialog 2>&-`" ] && DIALOG="Xdialog --wrap"
+else
+	# If we don't have a display variable, use dialog
+	[ -z "$DIALOG" -a -x "`which  dialog 2>&-`" ] && DIALOG="dialog"
+fi
+
+if [ -z "$DIALOG" ]
+then
+	ERROR="Please install a dialog program, either kdialog (kdebase)
+or gdialog (gnome-utils or zenity), or cdialog for the console, 
+to use this program"
+	#First try and tell the user there is no dialog
+	if [ -x "`which gmessage 2>&-`" -a -n "$DISPLAY" ]
+	then
+		gmessage "$ERROR" 
+	else
+		echo "$ERROR"
+	fi
+	exit 2
+fi
+	
+if [ "$DIALOG" == "kdialog" ]
+then
+	DLGOPT=""
+	DLGMOPT=""
+else
+	#Set options for gdialog and cdialog
+	DLGOPT="9 42"
+	# Height (1) must be list height (3) + 6
+	DLGMOPT="14 42 8"
+fi
+
+# Root sets the global cursor
+if [ `id -u` -eq 0 ]
+then
+	INDEX=$ICONS/$INDEXFILE
+else
+	INDEX=$USERICONS/$INDEXFILE
+	[ ! -d $USERICONS/default ] &&mkdir -p $USERICONS/default
+	[ ! -e $INDEX ] && touch $INDEX
+fi
+	
+# Create a temporary file to backup the index file:
+BINDEX=`mktemp -q $INDEX.XXXXXX`
+if [ $? -ne 0 ]
+then
+	echo "$0: Can't create temp file, exiting...	"
+	exit 1
+fi
+									       
+cp -f $INDEX $BINDEX 2>/dev/null
+UNCONFIRMED=1
+while [ $UNCONFIRMED -ne 0 ];do
+	TITLE="Mouse Cursor Theme Selector"
+	# console dialog gives choice on stderr, while kdialog gives noise
+	if [ "$DIALOG" != "kdialog" ]
+	then
+		THEME=${c[`$DIALOG --title "$TITLE" --menu "$MESSAGE" $DLGMOPT $MENU 2>&1`]}
+	else
+		THEME=${c[`$DIALOG --title "$TITLE" --menu "$MESSAGE" $DLGMOPT $MENU 2>/dev/null`]}
+	fi	
+	if [ $? -eq 0 ]
+	then
+		grep -q "\[Icon Theme\]" $BINDEX 2>/dev/null
+		if [ $? -eq 0 ]
+		then
+			cat $BINDEX |sed -e "s/^Inherits=.*$/Inherits=$THEME/g" >$INDEX
+		else
+			echo "[Icon Theme]" > $INDEX
+			echo "Inherits=$THEME" >> $INDEX
+		fi
+
+		# Make a dialog so the user can see the new icon and decide if
+		# they want to keep it.
+		TITLE="Cursor Preview"
+QUESTION="Do you want to keep this theme?"
+[ "$DIALOG" == "kdialog" ]|| QUESTION="   $QUESTION
+
+   (you may need to start another 
+application now to preview the theme)"
+		$DIALOG --title "$TITLE" --yesno "$QUESTION" $DLGOPT
+		UNCONFIRMED=$?
+	else
+		if [ $UNCONFIRMED -ne 0 ]
+		then
+			#echo "restoring index"
+			mv -f $BINDEX $INDEX
+		fi
+		exit 1
+	fi
+done
+
+# After setting the cursor, we may want to restart the WM so it gets the 
+# icons too:
+
+QUESTION="Do you want to restart your window 
+ manager to use the new cursors?
+
+  Note: other running applications 
+    will still use the old cursors"
+TITLE="Apply changes now?"
+$DIALOG --title "$TITLE" --yesno "$QUESTION" $DLGOPT
+
+if [ $? -eq 0 ]
+then
+	# wmaker: "killall -USR1 wmaker"
+	[ -n "$WMAKER_BIN_NAME" ] && killall -USR1 wmaker
+	# metacity: "metacity --replace"
+	[ -n "$GNOME_DESKTOP_SESSION_ID" ] && metacity --replace &
+	# sawfish: sawfish-client --display $DISPLAY -f "(restart)"
+	# icewm: killall -HUP icewm
+
+	#kde
+	if [ "$DESKTOP" == "kde" ];then
+		#echo "restarting kwin"
+		dcop kwin MainApplication-Interface quit;kstart kwin & >/dev/null 2>&1
+		#echo "restarting kicker"
+		dcop kicker kicker restart & >/dev/null 2>&1
+		#echo "restarting kdesktop"
+		#kdekillall kdesktop only works once!
+		kdekillall kdesktop >/dev/null 2>&1 ||killall kdesktop >/dev/null 2>&1
+		kstart kdesktop & >/dev/null 2>&1
+	fi
+fi
+
+# Clean up our temp file:
+[ -e $BINDEX ] && rm -f $BINDEX 2>/dev/null

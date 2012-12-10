@@ -179,3 +179,91 @@ fi
 %{_miconsdir}/%{name}.png
 %{_liconsdir}/%{name}.png
 %{_bindir}/*
+
+
+%changelog
+* Thu Dec 09 2010 Oden Eriksson <oeriksson@mandriva.com> 0.0.5-8mdv2011.0
++ Revision: 617483
+- the mass rebuild of 2010.0 packages
+
+* Wed Sep 02 2009 Thierry Vignaud <tv@mandriva.org> 0.0.5-7mdv2010.0
++ Revision: 425448
+- rebuild
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - lowercase ImageMagick
+
+* Wed Jul 23 2008 Thierry Vignaud <tv@mandriva.org> 0.0.5-6mdv2009.0
++ Revision: 243833
+- rebuild
+
+  + Pixel <pixel@mandriva.com>
+    - rpm filetriggers deprecates update_menus/update_scrollkeeper/update_mime_database/update_icon_cache/update_desktop_database/post_install_gconf_schemas
+
+* Wed Jan 02 2008 Olivier Blin <oblin@mandriva.com> 0.0.5-4mdv2008.1
++ Revision: 140717
+- restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Wed Aug 29 2007 Funda Wang <fwang@mandriva.org> 0.0.5-4mdv2008.0
++ Revision: 73449
+- fix menu category -> Only Settings/DesktopSettings now.
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill desktop-file-validate's 'warning: key "Encoding" in group "Desktop Entry" is deprecated'
+
+* Thu Aug 23 2007 Thierry Vignaud <tv@mandriva.org> 0.0.5-3mdv2008.0
++ Revision: 69492
+- convert menu to XDG
+- use %%mkrel
+
+
+* Tue Aug 17 2004 Frederic Crozat <fcrozat@mandrakesoft.com> 0.0.5-2mdk
+- Add script to fix upgrade (Mdk bug #10316)
+
+* Mon Apr 19 2004 Buchan Milne <bgmilne@linux0mandrake.com> 0.0.5-1mdk
+- Fixes to choose-cursor
+   -Fix support for zenity's gdialog (really better fix for chatty kdialog)
+     fixes #9455
+   -Prevent themes ever getting version numbers
+   -Ensure we really get user icons
+- Cursor theme update
+   -Updates: RedDot (keep link to reddot)
+   -New themes: justwhite,justgreen,justwhite,daliesque
+
+* Wed Aug 27 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.4-1mdk
+- Fixes in script:
+  - Fixes for chatty kdialog (don't redirect stderr to stdout), but
+    don't break cdialog support (outputs choice to stderr)
+  - Tell the user if we don't have a usable dialog program
+  - Don't use gdialog in console (zenity gdialog doesn't work in
+    console)
+  - Adjust dialog sizes to fit for cdialog
+- Since we have gmessage warning if no dialog is found, don't require a
+  dialog, just gtkdialogs (for gmessage)
+- Don't use versions in theme name
+
+* Wed Jul 16 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.3-1mdk
+- Fixes in script
+- 11i or more new cursor themes, and 3 updated themes
+- Own theme directories (distriblint)
+- Drop Xdialog requirement, and hope the user has a dialog program (is there a
+  better solution?)
+
+* Sun Apr 06 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.2-2mdk
+- Fixes to choose_cursor (thanks Duncan)
+- bexos_colour 0.4, BlueGlass 0.2
+- Fix up bexos so we actually include it
+- Untar tuxcursors so we include them too
+
+* Thu Apr 03 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.2-1mdk
+- New choose_cursor script
+
+* Sun Mar 30 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.1-2mdk
+- BuildRequires (thx sldb)
+
+* Sat Mar 29 2003 Buchan Milne <bgmilne@linux-mandrake.com> 0.0.1-1mdk
+- First Mandrake package (25 total cursor themes besides the 3 stock ones)
+
