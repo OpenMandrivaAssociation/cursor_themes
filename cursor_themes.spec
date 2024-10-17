@@ -8,7 +8,7 @@ Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 License:	GPL
-Url:		http://kde-look.org
+Url:		https://kde-look.org
 BuildArch:	noarch
 Group:		Graphical desktop/Other
 Source:		choose_cursor
